@@ -1,0 +1,63 @@
+name: Shippable Build & Signing
+on:
+  workflow_dispatch:
+    inputs:
+      gh_environment:
+        description: Github environment name
+        required: true
+        default: ''
+        type: choice
+        options:
+          - thunderbird_beta
+          - thunderbird_daily
+          - thunderbird_release
+          - thunderbird_debug
+
+jobs:
+  build_unsigned:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      matrix:
+        include: ${{ fromJSON(vars.MATRIX_INCLUDE) }}
+    environment: ${{ inputs.gh_environment }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ env.ACT }}  # Skip in GitHub CI
+        with:
+          path: "."
+
+      - name: build
+        uses: ./.github/actions/build_mobile
+        with:
+          packageFormat: ${{ matrix.packageFormat }}
+          packageFlavor: ${{ matrix.packageflavor }}
+          appName: ${{ vars.APP_NAME }}
+          releaseType: ${{ vars.RELEASE_TYPE }}
+          revSha: ${{ github.sha }}
+
+  sign_mobile:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJSON(vars.MATRIX_INCLUDE) }}
+    environment: ${{ needs.build_unsigned.outputs.appName }}_${{ needs.build_unsigned.outputs.releaseType }}_${{ matrix.packageFlavor }}
+    needs: [ build_unsigned ]
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ env.ACT }}  # Skip in GitHub CI
+        with:
+          path: "."
+
+
+      - name: sign
+        uses: ./.github/actions/sign_mobile
+        with:
+          packageFormat: ${{ matrix.packageFormat }}
+          packageFlavor: ${{ matrix.packageFlavor }}
+          appName: ${{ needs.build_unsigned.outputs.appName }}
+          releaseType: ${{ needs.build_unsigned.outputs.releaseType }}
+          signingKey: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
