@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       matrix:
-        include: ${{ fromJSON(vars.MATRIX_INCLUDE) }}
+        include: ${{ vars.MATRIX_INCLUDE }}
     environment: ${{ inputs.gh_environment }}
     outputs:
       appName: ${{ vars.APP_NAME }}
