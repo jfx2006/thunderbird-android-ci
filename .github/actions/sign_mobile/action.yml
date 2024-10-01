@@ -8,7 +8,7 @@ inputs:
   packageFlavor:
     description: Package flavor
     required: true
-    default: "foss"
+    default: "full"
   appName:
     description: app- name to sign for
     required: true

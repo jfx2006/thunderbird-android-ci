@@ -9,7 +9,7 @@ inputs:
   packageFlavor:
     description: Package flavor
     required: true
-    default: "foss"
+    default: "full"
   appName:
     description: app-name
     required: true
@@ -18,9 +18,6 @@ inputs:
     description: release type
     required: true
     default: debug
-  revSha:
-    description: sha revision
-    required: true
 outputs:
   appName:
     description: app-name
@@ -33,8 +30,6 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-      with:
-        ref: ${{ inputs.revSha }}
 
     - name: Copy CI gradle.properties
       shell: bash
@@ -60,7 +55,7 @@ runs:
           if [[ "$PACKAGE_FORMAT" = "apk" ]]; then
             BUILD_CMD="assemble"
           fi
-          # ^ upper-case first characater of bash string
+          # ^ upper-case first character of bash string
           BUILD_COMMAND="${BUILD_CMD}${PACKAGE_FLAVOR^}${RELEASE_TYPE^}"
           echo "BUILDING: :${APP_NAME}:${BUILD_COMMAND}"
           ./gradlew clean :${APP_NAME}:${BUILD_COMMAND} --no-build-cache --no-configuration-cache
@@ -73,7 +68,7 @@ runs:
         PACKAGE_FLAVOR: ${{ inputs.packageFlavor }}
         APP_NAME: ${{ inputs.appName }}
         RELEASE_TYPE: ${{ inputs.releaseType }}
-        OUT_BASE: ${{ inputs.APP_NAME }}/build/outputs/${{ inputs.packageFormat }}
+        OUT_BASE: ${{ inputs.appName }}/build/outputs/${{ inputs.packageFormat }}
         UPLOAD_PATH: "uploads"
       run: |
         mkdir -p "${UPLOAD_PATH}"
@@ -102,7 +97,9 @@ runs:
 
     - name: Upload unsigned
       uses: actions/upload-artifact@v4
+      env:
+        UPLOAD_PATH: "uploads"
       with:
         name: unsigned-${{ inputs.packageFormat }}-${{ inputs.packageFlavor }}
-        path: uploads/
+        path: ${{ env.UPLOAD_PATH }}/
         if-no-files-found: error

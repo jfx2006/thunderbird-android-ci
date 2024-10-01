@@ -23,10 +23,15 @@ jobs:
     environment: ${{ inputs.gh_environment }}
     steps:
       - uses: actions/checkout@v4
-        if: ${{ env.ACT }}  # Skip in GitHub CI
+        if: ${{ env.ACT }}  # Only run step in Act workflow development environment: https://nektosact.com/
         with:
           path: "."
 
+      - name: Print Info
+        run: |
+          echo "REPO: ${GITHUB_REPOSITORY}"
+          echo "BRANCH: ${GITHUB_REF_NAME}"
+          echo "REVISION: ${GITHUB_SHA}"
       - name: build
         uses: ./.github/actions/build_mobile
         with:
@@ -34,7 +39,6 @@ jobs:
           packageFlavor: ${{ matrix.packageflavor }}
           appName: ${{ vars.APP_NAME }}
           releaseType: ${{ vars.RELEASE_TYPE }}
-          revSha: ${{ github.sha }}
 
   sign_mobile:
     runs-on: ubuntu-latest
@@ -44,12 +48,6 @@ jobs:
     environment: ${{ needs.build_unsigned.outputs.appName }}_${{ needs.build_unsigned.outputs.releaseType }}_${{ matrix.packageFlavor }}
     needs: [ build_unsigned ]
     steps:
-      - uses: actions/checkout@v4
-        if: ${{ env.ACT }}  # Skip in GitHub CI
-        with:
-          path: "."
-
-
       - name: sign
         uses: ./.github/actions/sign_mobile
         with:
@@ -57,7 +55,7 @@ jobs:
           packageFlavor: ${{ matrix.packageFlavor }}
           appName: ${{ needs.build_unsigned.outputs.appName }}
           releaseType: ${{ needs.build_unsigned.outputs.releaseType }}
-          signingKey: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          signingKey: ::add-mask::${{ secrets.SIGNING_KEY }}
+          alias: ::add-mask::${{ secrets.KEY_ALIAS }}
+          keyPassword: ::add-mask::${{ secrets.KEY_PASSWORD }}
+          keyStorePassword: ::add-mask::${{ secrets.KEY_STORE_PASSWORD }}
