@@ -14,6 +14,20 @@ on:
           - thunderbird_debug
 
 jobs:
+  dump_config:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.gh_environment }}
+    steps:
+      - name: Dump Vars context
+        env:
+          VARS_CONTEXT: ${{ toJSON(vars) }}
+          MATRIX_INCLUDE: ${{ vars.MATRIX_INCLUDE }}
+        run: |
+          echo "$VARS_CONTEXT"
+          echo "$MATRIX_INCLUDE"
+
+
+
   build_unsigned:
     runs-on: ubuntu-latest
     timeout-minutes: 90
