@@ -152,5 +152,5 @@ jobs:
           name: signed-${{ env.APP_NAME}}-${{ matrix.packageFormat }}-${{ matrix.packageFlavor }}
           if-no-files-found: error
           path: |
-            uploads/*.apk
+            uploads/*-signed.apk
             uploads/*.aab
