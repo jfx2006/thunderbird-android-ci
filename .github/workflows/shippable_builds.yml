@@ -120,8 +120,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJSON(needs.build_unsigned.outputs.matrixInclude) }}
-    environment: ${{ needs.build_unsigned.outputs.appName }}_${{ needs.build_unsigned.outputs.releaseType }}_${{ matrix.packageFlavor }}
+        include: "${{ fromJSON(needs.dump_config.outputs.matrixInclude) }}"
+    environment: ${{ needs.dump_config.outputs.appName }}_${{ needs.dump_config.outputs.releaseType }}_${{ matrix.packageFlavor }}
     needs: [build_unsigned, dump_config]
     env:
       APP_NAME: ${{ needs.dump_config.outputs.appName }}
