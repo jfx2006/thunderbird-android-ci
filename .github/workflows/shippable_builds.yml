@@ -17,28 +17,30 @@ jobs:
   dump_config:
     runs-on: ubuntu-latest
     environment: ${{ inputs.gh_environment }}
+    outputs:
+      matrixInclude: ${{ vars.MATRIX_INCLUDE }}
+      appName: ${{ vars.APP_NAME }}
+      releaseType: ${{ vars.RELEASE_TYPE }}
     steps:
       - name: Dump Vars context
+        id: variables
         env:
           VARS_CONTEXT: ${{ toJSON(vars) }}
           MATRIX_INCLUDE: ${{ vars.MATRIX_INCLUDE }}
         run: |
           echo "$VARS_CONTEXT"
           echo "$MATRIX_INCLUDE"
-
+          ## echo "$MATRIX_INCLUDE" >> $GITHUB_OUTPUT
 
 
   build_unsigned:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    needs: [dump_config]
     strategy:
       matrix:
-        include: ${{ vars.MATRIX_INCLUDE }}
+        include: "${{ fromJSON(needs.dump_config.outputs.matrixInclude) }}"
     environment: ${{ inputs.gh_environment }}
-    outputs:
-      appName: ${{ vars.APP_NAME }}
-      releaseType: ${{ vars.RELEASE_TYPE }}
-      matrixInclude: ${{ vars.MATRIX_INCLUDE }}
     steps:
       - uses: actions/checkout@v4
 
@@ -121,10 +123,10 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.build_unsigned.outputs.matrixInclude) }}
     environment: ${{ needs.build_unsigned.outputs.appName }}_${{ needs.build_unsigned.outputs.releaseType }}_${{ matrix.packageFlavor }}
-    needs: [build_unsigned]
+    needs: [build_unsigned, dump_config]
     env:
-      APP_NAME: ${{ needs.build_unsigned.outputs.appName }}
-      RELEASE_TYPE: ${{ needs.build_unsigned.outputs.releaseType }}
+      APP_NAME: ${{ needs.dump_config.outputs.appName }}
+      RELEASE_TYPE: ${{ needs.dump_config.outputs.releaseType }}
     steps:
       - uses: actions/download-artifact@v4
         with:
