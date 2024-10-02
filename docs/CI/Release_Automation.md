@@ -9,6 +9,7 @@ also select the appropriate branch to run the workflow on. The environments are 
 accessible by the branch they are associated with
 
 **Environments**
+
 - thunderbird_beta
 - thunderbird_daily
 - thunderbird_release
@@ -19,7 +20,7 @@ The variables set in these environments are non-sensitive and are used by the bu
 - APP_NAME: app-thunderbird | app-k9
 - RELEASE_TYPE: debug | daily | beta | release
 - MATRIX_INCLUDE:
-  - This is a JSON string used to create the jobs matrix. For example, for 
+  - This is a JSON string used to create the jobs matrix. For example, for
     Thunderbird beta, the (YAML) value would be:
   ```yaml
   - packageFormat: bundle
@@ -33,9 +34,10 @@ There are also "secret" environments that are used by the signing job.
 
 An "upload" secret environment and a "signing" secret environment are needed. Currently the environment names are based on the appName, releaseType, and packageFlavor. So `app-thunderbird_beta_full` which would have the upload signing configuration for Thunderbird Beta set up. This could be improved.
 The secrets themselves are from https://github.com/noriban/sign-android-release:
+
 ```yaml
 signingKey: ${{ secrets.SIGNING_KEY }}
 alias: ${{ secrets.KEY_ALIAS }}
 keyPassword: ${{ secrets.KEY_PASSWORD }}
 keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-   ```
+```
