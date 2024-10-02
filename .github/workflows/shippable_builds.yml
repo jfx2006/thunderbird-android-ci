@@ -86,7 +86,7 @@ jobs:
         run: |
           mkdir -p "${UPLOAD_PATH}"
           if [[ "${PACKAGE_FORMAT}" = "apk" ]]; then
-            OUT_PATH="${OUT_BASE}/${PACKAGE_FORMAT}/${PACKAGE_FLAVOR}/${RELEASE_TYPE}"
+            OUT_PATH="${OUT_BASE}/${PACKAGE_FLAVOR}/${RELEASE_TYPE}"
             OUT_FILE="${APP_NAME}-${PACKAGE_FLAVOR}-${RELEASE_TYPE}-unsigned.apk"
             RENAMED_FILE="${OUT_FILE/-unsigned/}"
           elif [[ "${PACKAGE_FORMAT}" = "bundle" ]]; then
