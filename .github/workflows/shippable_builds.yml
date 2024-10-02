@@ -89,8 +89,7 @@ jobs:
             OUT_PATH="${OUT_BASE}/${PACKAGE_FORMAT}/${PACKAGE_FLAVOR}/${RELEASE_TYPE}"
             OUT_FILE="${APP_NAME}-${PACKAGE_FLAVOR}-${RELEASE_TYPE}-unsigned.apk"
             RENAMED_FILE="${OUT_FILE/-unsigned/}"
-          fi
-          if [[ "${PACKAGE_FORMAT}" = "bundle" ]]; then
+          elif [[ "${PACKAGE_FORMAT}" = "bundle" ]]; then
             OUT_PATH="${OUT_BASE}/${PACKAGE_FLAVOR}${RELEASE_TYPE^}"
             OUT_FILE="${APP_NAME}-${PACKAGE_FLAVOR}-${RELEASE_TYPE}.aab"
             RENAMED_FILE="${OUT_FILE}"
