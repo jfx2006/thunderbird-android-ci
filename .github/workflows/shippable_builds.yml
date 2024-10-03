@@ -154,3 +154,48 @@ jobs:
           path: |
             uploads/*-signed.apk
             uploads/*.aab
+
+  pre_publish:
+    # This is a holding job meant to require approval before proceeding with the publishing jobs below
+    # The environment has a deployment protection rule requiring approval from a set of named reviewers
+    # before proceeding.
+    environment: gh_publisher
+    needs: [sign_mobile]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approval
+        shell: bash
+        run: |
+          true
+
+  github_release:
+    runs-on: ubuntu-latest
+    needs: [ build_unsigned, dump_config ]
+    env:
+      APP_NAME: ${{ needs.dump_config.outputs.appName }}
+      RELEASE_TYPE: ${{ needs.dump_config.outputs.releaseType }}
+      PACKAGE_FORMAT: "apk"
+      PACKAGE_FLAVOR: "foss"
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          # The artifact name is the APK FOSS package for Github releases
+          name: unsigned-${{ env.APP_NAME }}-${{ env.PACKAGE_FORMAT }}-${{ env.PACKAGE_FORMAT }}
+          path: uploads/
+
+      - name: Get Version -> Tag Name
+        ## This obviously is quite incorrect. Need a way to extract versionName from gradle
+        shell: bash
+        run: |
+          _version=${GITHUB_SHA:0:12}
+          _tag="v_${_version}"
+          echo "TAG_NAME=${_tag}" >> $GITHUB_ENV
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          target_commitish: ${{ github.sha }}
+          tag_name: ${{ env.TAG_NAME }}
+          fail_on_unmatched_files: true
+          files: |
+            artifacts/github_release_file.txt
