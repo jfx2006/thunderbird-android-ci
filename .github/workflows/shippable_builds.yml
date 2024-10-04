@@ -192,7 +192,7 @@ jobs:
           APKANALYZER: "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/apkanalyzer"
         run: |
           APK_FILE="${APP_NAME}-${PACKAGE_FLAVOR}-${RELEASE_TYPE}-signed.apk"
-          _version=$({APKANALYZER} manifest version-name "${UPLOADS}/${APK}")
+          _version=$(${APKANALYZER} manifest version-name "${UPLOADS}/${APK}")
           _tag="${APP_NAME}-${_version}"
           echo "TAG_NAME=${_tag}" >> $GITHUB_ENV
           echo "APK_FILE=${APK_FILE}" >> $GITHUB_ENV
