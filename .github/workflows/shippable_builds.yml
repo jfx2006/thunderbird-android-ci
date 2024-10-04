@@ -179,6 +179,11 @@ jobs:
       PACKAGE_FLAVOR: "foss"
       UPLOADS: "uploads"
     steps:
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - uses: actions/download-artifact@v4
         with:
           # The artifact name is the APK FOSS package for Github releases
@@ -189,7 +194,7 @@ jobs:
         ## This obviously is quite incorrect. Need a way to extract versionName from gradle
         shell: bash
         env:
-          APKANALYZER: "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/apkanalyzer"
+          APKANALYZER: ${{ env.ANDROID_SDK_ROOT}}/cmdline-tools/latest/bin/apkanalyzer
         run: |
           APK_FILE="${APP_NAME}-${PACKAGE_FLAVOR}-${RELEASE_TYPE}-signed.apk"
           _version=$(${APKANALYZER} manifest version-name "${UPLOADS}/${APK}")
