@@ -60,10 +60,11 @@ manually.
 "gh_releases" contains the Client Id and Private Key for a Github App that's used by the "actions/create-github-app-token'
 to generate a token with the appropriate permissions to create and tag a Github release.
 
-|   | Name | Description |
-|---|------|---|
-|Variable   |RELEASER_APP_CLIENT_ID      | The Client ID of the github app |
-|Secret|RELEASER_APP_PRIVATE_KEY| The private key of the app   |
+|          | Name                     | Description                     |
+| -------- | ------------------------ | ------------------------------- |
+| Variable | RELEASER_APP_CLIENT_ID   | The Client ID of the github app |
+| Secret   | RELEASER_APP_PRIVATE_KEY | The private key of the app      |
 
 ### App Permissions
- **TODO**
+
+**TODO**
